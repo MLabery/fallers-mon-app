@@ -23,7 +23,7 @@ jobs:
       - name: 🟢 Configurar Node.js (Entorno Web)
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Una versión moderna de Node
+          node-version: '22' # Una versión moderna de Node
 
       # Instala las librerías NPM
       - name: 📥 Instalar dependencias
