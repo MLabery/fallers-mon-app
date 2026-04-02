@@ -1,0 +1,61 @@
+name: Compilador iOS en la Nube 🍏
+
+# Cuándo queremos que se ejecute esto:
+# - Manualmente desde la web de GitHub (workflow_dispatch)
+# - Opcional: Cuando subamos código a la rama principal (push a main)
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-iphone-app:
+    # "Hola GitHub, coge un ordenador Mac..."
+    runs-on: macos-latest
+
+    steps:
+      # Descarga nuestra carpeta de código
+      - name: 📦 Clonar repositorio
+        uses: actions/checkout@v4
+
+      # "...instala Node.js..."
+      - name: 🟢 Configurar Node.js (Entorno Web)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Una versión moderna de Node
+
+      # Instala las librerías NPM
+      - name: 📥 Instalar dependencias
+        run: npm install
+
+      # "...ejecuta npm run build..."
+      - name: 🏗️ Compilar página web (React/Vite)
+        run: npm run build
+
+      # Esta parte es vital de Capacitor: coge la web y la inyecta al proyecto de iOS
+      - name: 🌉 Sincronizar código con Capacitor iOS
+        run: npx cap sync ios
+
+      # "...abre Xcode y expórtame la aplicación"
+      # =========================================================================
+      # ⚠️ ATENCIÓN: Xcode obliga a tener la App "Firmada" (Code Signing)
+      # para generar un .ipa instalable en un dispositivo real de Apple.
+      # Para que esto genere el .ipa final, necesitarás añadir los certificados
+      # de tu cuenta de "Apple Developer" en Ajustes de GitHub > Secrets.
+      # =========================================================================
+      
+      # Ejemplo de compilación base (Verificando que todo el código es correcto)
+      - name: 🛠️ Compilar Aplicación en Xcode
+        run: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+                     -scheme App \
+                     -configuration Release \
+                     -destination 'generic/platform=iOS' \
+                     CODE_SIGNING_ALLOWED=NO \
+                     clean build
+
+      # (Cuando tengas tus certificados de Apple listos, aquí abajo 
+      # se pondría el paso para firmarla y exportar el archivo .ipa
+      # permitiéndote descargarlo de GitHub mediante artifact upload).
