@@ -35,10 +35,7 @@ jobs:
 
       # Esta parte es vital de Capacitor: coge la web y la inyecta al proyecto de iOS
       - name: 🌉 Sincronizar código con Capacitor iOS
-        run: |
-          npx cap sync ios
-          cd ios/App
-          pod install
+        run: npx cap sync ios
 
       # "...abre Xcode y expórtame la aplicación"
       # =========================================================================
@@ -52,7 +49,7 @@ jobs:
       - name: 🛠️ Compilar Aplicación en Xcode
         run: |
           cd ios/App
-          xcodebuild -workspace App.xcworkspace \
+          xcodebuild -project App.xcodeproj \
                      -scheme App \
                      -configuration Release \
                      -destination 'generic/platform=iOS' \
